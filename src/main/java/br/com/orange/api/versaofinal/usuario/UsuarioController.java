@@ -1,13 +1,11 @@
 package br.com.orange.api.versaofinal.usuario;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import br.com.orange.api.versaofinal.usuario.service.UsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 
@@ -15,19 +13,19 @@ import javax.validation.Valid;
 @RequestMapping("/api/usuario")
 public class UsuarioController {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
+
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     @PostMapping
-    public ResponseEntity<?> cadastraUsuario(@Valid @RequestBody CadastraUsuarioRequest request) {
-        if(usuarioRepository.existsByCpf(request.getCpf())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ja existe Usuario com esse CPF Cadastrado");
-        }
-        if (usuarioRepository.existsByEmail(request.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ja existe Usuario com esse Email Cadastrado");
-        }
-        Usuario novaUsuario = request.toModel();
-        usuarioRepository.save(novaUsuario);
+    public ResponseEntity<String> cadastraUsuario(@Valid @RequestBody CadastraUsuarioRequest request) {
+        // metodo responsavel por verificar se existe usuario cadastrado com cpf ou email no sistema
+        usuarioService.validaUsuarioExistente(request.getCpf(), request.getEmail());
+
+        Usuario novoUsuario = request.toModel();
+        usuarioService.salvaUsuario(novoUsuario);
         return ResponseEntity.status(201).body("Usuario cadastrado!");
     }
 }

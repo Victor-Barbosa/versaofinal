@@ -1,15 +1,12 @@
 package br.com.orange.api.versaofinal.vacinacao;
 
 import br.com.orange.api.versaofinal.usuario.Usuario;
-import br.com.orange.api.versaofinal.usuario.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import br.com.orange.api.versaofinal.vacinacao.service.VacinacaoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 
@@ -17,21 +14,20 @@ import javax.validation.Valid;
 @RequestMapping("/api/vacinacao")
 public class VacinacaoController {
 
-    @Autowired
-    private VacinacaoRepository vacinacaoRepository;
+    private final VacinacaoService vacinacaoService;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    public VacinacaoController(VacinacaoService vacinacaoService) {
+        this.vacinacaoService = vacinacaoService;
+    }
 
     @PostMapping
-    public ResponseEntity<?> novaVacinacao (@Valid @RequestBody NovaVacinacaoRequest request){
+    public ResponseEntity<String> novaVacinacao (@Valid @RequestBody CadastraVacinacaoRequest request){
 
-       Usuario usuario = usuarioRepository.findByEmail(request.getEmailUsuario())
-               .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                       "Não existe usuario com esse mail cadastrado"));
+        //Busca usuario pelo email, caso não encontre joga uma exceção.
+        Usuario usuario = vacinacaoService.buscaUsuarioPorEmail(request.getEmailUsuario());
 
         Vacinacao novaVacinacao = request.toModel(usuario);
-        vacinacaoRepository.save(novaVacinacao);
+        vacinacaoService.salvaVacinacao(novaVacinacao);
         return ResponseEntity.status(201).body("Vacinação concluída");
     }
 }

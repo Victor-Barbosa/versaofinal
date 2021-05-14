@@ -12,19 +12,19 @@ public class CadastraUsuarioRequest {
 
     @NotBlank(message = "Nome precisa ter no mínimo 3 caracteres")
     @Length(min = 3)
-    private String nome;
+    private final String nome;
 
     @NotBlank
     @CPF
-    private String cpf;
+    private final String cpf;
 
     @NotBlank
     @Email
     @Length(min = 5)
-    private String email;
+    private final String email;
 
     @NotNull
-    private LocalDate dataNascimento;
+    private final LocalDate dataNascimento;
 
     public CadastraUsuarioRequest(String nome, String cpf, String email, LocalDate dataNascimento) {
         this.nome = nome;
