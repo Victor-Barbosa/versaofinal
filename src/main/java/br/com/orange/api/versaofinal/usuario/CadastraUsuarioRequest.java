@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 public class CadastraUsuarioRequest {
 
-    @NotBlank(message = "Nome precisa ter no mínimo 3 caracteres")
+    @NotBlank
     @Length(min = 3)
     private final String nome;
 
